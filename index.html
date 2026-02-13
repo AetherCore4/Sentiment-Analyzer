@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentiment Analysis Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 900px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .info-box {
+            background: #f0f4ff;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            color: #667eea;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+
+        .input-section {
+            margin-bottom: 30px;
+        }
+
+        label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 1.05em;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+            resize: vertical;
+            min-height: 120px;
+            font-family: inherit;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .model-selector {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .radio-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        input[type="radio"] {
+            cursor: pointer;
+        }
+
+        .radio-group label {
+            margin: 0;
+            cursor: pointer;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-analyze {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .btn-analyze:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .btn-clear {
+            background: #f5f5f5;
+            color: #333;
+            border: 2px solid #e0e0e0;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .btn-clear:hover {
+            background: #e8e8e8;
+        }
+
+        .btn-example {
+            background: #f0f4ff;
+            color: #667eea;
+            border: 2px solid #667eea;
+            padding: 10px 20px;
+            font-size: 0.95em;
+            flex: none;
+        }
+
+        .btn-example:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .results-section {
+            background: #f9fafb;
+            border-radius: 15px;
+            padding: 30px;
+            display: none;
+        }
+
+        .results-section.visible {
+            display: block;
+        }
+
+        .emotion-display {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .emotion-name {
+            font-size: 2.5em;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .confidence-score {
+            font-size: 1.3em;
+        }
+
+        .confidence-bar {
+            background: rgba(255, 255, 255, 0.2);
+            height: 8px;
+            border-radius: 4px;
+            margin-top: 15px;
+            overflow: hidden;
+        }
+
+        .confidence-fill {
+            background: rgba(255, 255, 255, 0.8);
+            height: 100%;
+            transition: width 0.5s ease-out;
+        }
+
+        .analyzed-text {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+            margin-bottom: 20px;
+            font-size: 0.95em;
+            color: #333;
+        }
+
+        .emotions-breakdown {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .breakdown-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .emotion-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            gap: 15px;
+        }
+
+        .emotion-label {
+            min-width: 100px;
+            font-weight: 600;
+            text-transform: capitalize;
+        }
+
+        .emotion-bar-container {
+            flex: 1;
+            background: #e0e0e0;
+            border-radius: 8px;
+            height: 25px;
+            overflow: hidden;
+        }
+
+        .emotion-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.5s ease-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 30px;
+        }
+
+        .emotion-percentage {
+            color: white;
+            font-size: 0.85em;
+            font-weight: 600;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .examples-section {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .examples-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .example-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .example-item {
+            background: #f5f5f5;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 0.9em;
+            color: #666;
+            border-left: 3px solid #667eea;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .example-item:hover {
+            background: #e8ecf6;
+            transform: translateX(5px);
+        }
+
+        .error-message {
+            background: #fee;
+            color: #c33;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #c33;
+            display: none;
+            margin-bottom: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .error-message.visible {
+            display: block;
+        }
+
+        .success-message {
+            background: #efe;
+            color: #3c3;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #3c3;
+            display: none;
+            margin-bottom: 20px;
+        }
+
+        .success-message.visible {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            button {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>😊 Sentiment Analyzer</h1>
+            <p class="subtitle">Analyze emotions in your text</p>
+        </header>
+
+        <div class="info-box">
+            <strong>📝 Instructions:</strong><br>
+            1. Add this code to your notebook at the end to start the server<br>
+            2. Run the notebook cells to train models<br>
+            3. Then use this interface to analyze text
+        </div>
+
+        <div class="error-message" id="errorMessage"></div>
+        <div class="success-message" id="successMessage"></div>
+
+        <div class="input-section">
+            <label for="textInput">Enter your text:</label>
+            <textarea id="textInput" placeholder="Type something to analyze..."></textarea>
+
+            <div>
+                <label style="margin-top: 15px;">Choose Model:</label>
+                <div class="model-selector">
+                    <div class="radio-group">
+                        <input type="radio" id="modelLogistic" name="model" value="logistic" checked>
+                        <label for="modelLogistic">Logistic Regression</label>
+                    </div>
+                    <div class="radio-group">
+                        <input type="radio" id="modelNB" name="model" value="naive_bayes">
+                        <label for="modelNB">Naive Bayes</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn-analyze" onclick="analyzeSentiment()">Analyze</button>
+                <button class="btn-clear" onclick="clearAll()">Clear</button>
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label style="font-weight: 600;">Try Examples:</label>
+                <div class="button-group" id="examplesContainer"></div>
+            </div>
+        </div>
+
+        <div class="results-section" id="resultsSection">
+            <div class="emotion-display">
+                <div class="emotion-name" id="emotionName">---</div>
+                <div class="confidence-score">
+                    Confidence: <span id="confidenceScore">0%</span>
+                </div>
+                <div class="confidence-bar">
+                    <div class="confidence-fill" id="confidenceFill" style="width: 0%;"></div>
+                </div>
+            </div>
+
+            <div class="analyzed-text">
+                <strong>Your text:</strong> <span id="analyzedText"></span>
+            </div>
+
+            <div class="emotions-breakdown">
+                <div class="breakdown-title">Emotion Breakdown</div>
+                <div id="emotionBreakdown"></div>
+            </div>
+
+            <div class="examples-section" id="emotionExamplesSection">
+                <div class="examples-title">📚 Similar examples:</div>
+                <div class="example-list" id="emotionExamples"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000/api';
+        let emotions = [];
+        let examples = {};
+
+        async function initializePage() {
+            try {
+                const emotionsRes = await fetch(`${API_URL}/emotions`);
+                if (!emotionsRes.ok) throw new Error('Backend not running');
+                emotions = await emotionsRes.json();
+                emotions = emotions.emotions || [];
+
+                const examplesRes = await fetch(`${API_URL}/examples`);
+                if (!examplesRes.ok) throw new Error('Examples failed');
+                examples = await examplesRes.json();
+
+                createExampleButtons();
+                showSuccess('✓ Connected to backend!');
+            } catch (error) {
+                const code = `# Add this to the end of your notebook and run it:
+import http.server
+import socketserver
+import json
+from urllib.parse import urlparse
+
+PORT = 8000
+
+class Handler(http.server.SimpleHTTPRequestHandler):
+    def do_GET(self):
+        if "/api/emotions" in self.path:
+            self.send_response(200)
+            self.send_header("Content-type", "application/json")
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.end_headers()
+            self.wfile.write(json.dumps({"emotions": list(number_emotion.values())}).encode())
+        elif "/api/examples" in self.path:
+            self.send_response(200)
+            self.send_header("Content-type", "application/json")
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.end_headers()
+            examples = {}
+            for emo in number_emotion.values():
+                examples[emo] = df[df["emotion"] == emotion_number[emo]]["text"].head(3).tolist()
+            self.wfile.write(json.dumps(examples).encode())
+        else:
+            self.send_response(404)
+            self.end_headers()
+    
+    def do_POST(self):
+        if "/api/analyze" in self.path:
+            content_length = int(self.headers.get("Content-Length", 0))
+            body = self.rfile.read(content_length).decode()
+            data = json.loads(body)
+            text = data.get("text", "").lower()
+            text = remove_punc(text)
+            text = remove_num(text)
+            text = remove_emoji(text)
+            text = remove_stopwords(text)
+            X_input = tfidf_vectorizer.transform([text])
+            model_type = data.get("model", "logistic")
+            if model_type == "naive_bayes":
+                pred = nb2_model.predict(X_input)[0]
+                probs = nb2_model.predict_proba(X_input)[0]
+            else:
+                pred = logistic_model.predict(X_input)[0]
+                probs = logistic_model.predict_proba(X_input)[0]
+            emotion = number_emotion[pred]
+            confidence = float(probs[pred])
+            all_emotions = {number_emotion[i]: float(probs[i]) for i in range(len(probs))}
+            response = {"text": data.get("text"), "emotion": emotion, "confidence": confidence, "all_emotions": all_emotions}
+            self.send_response(200)
+            self.send_header("Content-type", "application/json")
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.end_headers()
+            self.wfile.write(json.dumps(response).encode())
+        else:
+            self.send_response(404)
+            self.end_headers()
+    
+    def do_OPTIONS(self):
+        self.send_response(200)
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.end_headers()
+
+with socketserver.TCPServer(("", PORT), Handler) as httpd:
+    print(f"Server running at http://localhost:{PORT}")
+    httpd.serve_forever()`;
+                showError(`Backend not connected. Copy and paste this code at the end of your notebook cell:\\n\\n${code}`);
+            }
+        }
+
+        function createExampleButtons() {
+            const container = document.getElementById('examplesContainer');
+            if (emotions.length > 0) {
+                emotions.slice(0, 3).forEach(emotion => {
+                    const btn = document.createElement('button');
+                    btn.className = 'btn-example';
+                    btn.textContent = `"${emotion}"`;
+                    btn.onclick = () => loadExample(emotion);
+                    container.appendChild(btn);
+                });
+            }
+        }
+
+        function loadExample(emotion) {
+            if (examples[emotion] && examples[emotion].length > 0) {
+                const example = examples[emotion][Math.floor(Math.random() * examples[emotion].length)];
+                document.getElementById('textInput').value = example;
+            }
+        }
+
+        async function analyzeSentiment() {
+            const text = document.getElementById('textInput').value.trim();
+            const model = document.querySelector('input[name="model"]:checked').value;
+
+            if (!text) {
+                showError('Please enter text.');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/analyze`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({text, model})
+                });
+
+                if (!response.ok) throw new Error('Analysis failed');
+                const result = await response.json();
+                displayResults(result);
+            } catch (error) {
+                showError(`Error: ${error.message}`);
+            }
+        }
+
+        function displayResults(result) {
+            document.getElementById('analyzedText').textContent = result.text;
+            document.getElementById('emotionName').textContent = result.emotion.toUpperCase();
+            const confidence = (result.confidence * 100).toFixed(1);
+            document.getElementById('confidenceScore').textContent = confidence + '%';
+            document.getElementById('confidenceFill').style.width = confidence + '%';
+
+            const breakdown = document.getElementById('emotionBreakdown');
+            breakdown.innerHTML = '';
+
+            Object.entries(result.all_emotions)
+                .sort((a, b) => b[1] - a[1])
+                .forEach(([emotion, prob]) => {
+                    const pct = (prob * 100).toFixed(1);
+                    const item = document.createElement('div');
+                    item.className = 'emotion-item';
+                    item.innerHTML = `
+                        <div class="emotion-label">${emotion}</div>
+                        <div class="emotion-bar-container">
+                            <div class="emotion-bar" style="width: ${pct}%">
+                                <span class="emotion-percentage">${pct}%</span>
+                            </div>
+                        </div>
+                    `;
+                    breakdown.appendChild(item);
+                });
+
+            const examplesContainer = document.getElementById('emotionExamples');
+            examplesContainer.innerHTML = '';
+            if (examples[result.emotion]) {
+                examples[result.emotion].forEach(example => {
+                    const item = document.createElement('div');
+                    item.className = 'example-item';
+                    item.textContent = example;
+                    item.onclick = () => {
+                        document.getElementById('textInput').value = example;
+                        analyzeSentiment();
+                    };
+                    examplesContainer.appendChild(item);
+                });
+            }
+
+            document.getElementById('resultsSection').classList.add('visible');
+            showSuccess(`Emotion: ${result.emotion}`);
+        }
+
+        function clearAll() {
+            document.getElementById('textInput').value = '';
+            document.getElementById('resultsSection').classList.remove('visible');
+            document.getElementById('errorMessage').classList.remove('visible');
+        }
+
+        function showError(message) {
+            document.getElementById('errorMessage').textContent = message;
+            document.getElementById('errorMessage').classList.add('visible');
+        }
+
+        function showSuccess(message) {
+            document.getElementById('successMessage').textContent = message;
+            document.getElementById('successMessage').classList.add('visible');
+            setTimeout(() => document.getElementById('successMessage').classList.remove('visible'), 3000);
+        }
+
+        window.addEventListener('load', initializePage);
+    </script>
+</body>
+</html>
