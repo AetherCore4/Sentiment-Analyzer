@@ -1,47 +1,57 @@
-**Sentiment Analysis Tool**
+# 🧠 Emotion Sentiment Analysis Web App
 
-A simple machine learning application that detects emotions in text (Joy, Sadness, Anger, Love, etc.) using a Python backend and a vanilla HTML/JS frontend.
+A full-stack Machine Learning application that detects emotions (joy, sadness, anger, fear, love, surprise) from textual input. This project combines a custom-trained NLP model, a lightweight Python backend, and a responsive frontend.
 
-🚀 Quick Start
+---
 
-Install Dependencies
+## 🚀 Features
 
-pip install numpy pandas scikit-learn nltk matplotlib seaborn
+- **Real-time Emotion Detection** – Predicts emotion with confidence score instantly  
+- **Dual-Model Architecture** – Logistic Regression & Naive Bayes with TF-IDF  
+- **Lightweight Backend** – Built using Python's native `http.server`  
+- **Simple Frontend** – Pure HTML, CSS, and JavaScript (no frameworks)  
 
+---
 
-Train the Models
+## 📂 Project Structure
 
-Ensure train.txt is in your project folder.
+### 🔹 Files Overview
 
-Open output.ipynb and run all cells.
+- **`train.txt`**  
+  Dataset containing labeled text samples for emotion classification  
 
-This creates the required models_data.pkl file.
+- **`sentimentAnalysis.ipynb` / `output.ipynb`**  
+  Jupyter notebooks for EDA, preprocessing, and model training  
 
-Start the Server
+- **`models_data.pkl`**  
+  Serialized models, vectorizer, and label mappings  
 
-python server.py
+- **`server.py`**  
+  Backend server handling requests, preprocessing, and predictions  
 
+- **`index.html`**  
+  Frontend UI for user interaction and displaying results  
 
-Run the App
+---
 
-Open index.html in your web browser.
+## 🛠️ Tech Stack
 
-Type text and click Analyze.
+- **Language:** Python  
+- **Machine Learning:** Scikit-Learn (Logistic Regression, Naive Bayes)  
+- **NLP:** TF-IDF Vectorization  
+- **Frontend:** HTML, CSS, JavaScript  
+- **Backend:** Python `http.server`  
 
-📂 Project Files
+---
 
-server.py: The Python HTTP API server.
+## 💻 How to Run Locally
 
-index.html: The frontend user interface.
+### 📌 Prerequisites
+- Python 3.8+
 
-output.ipynb: Jupyter notebook for model training.
+### 🚀 Setup Steps
 
-models_data.pkl: The serialized trained models.
-
-✨ Features
-
-Dual Models: Switch between Logistic Regression and Naive Bayes.
-
-Confidence Scores: Displays the certainty of the prediction.
-
-Emotion Breakdown: Shows probabilities for all detected emotions.
+#### 1. Clone the Repository
+```bash
+git clone https://github.com/your-username/your-repo-name.git
+cd your-repo-name
